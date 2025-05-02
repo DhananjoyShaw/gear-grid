@@ -1,4 +1,4 @@
-import AddCarForm from "../_components/add-car-form";
+import AddCarForm from "./_components/add-car-form";
 
 export const metadata = {
   title: "Add New Car | GearGrid Admin",
