@@ -7,6 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
+import { serializeCarData } from "@/lib/helpers";
 
 // Function to convert File to base64
 async function fileToBase64(file) {

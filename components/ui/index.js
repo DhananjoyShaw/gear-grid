@@ -6,9 +6,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "./ca
 import { Checkbox } from "./checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 import { Label } from "./label";
+import { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption, } from "./table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "./dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "./dialog";
 
 export {
     Input, Button, Textarea, Select, SelectContent, SelectItem, SelectTrigger,
     SelectValue, Card, CardContent, CardDescription, CardHeader, CardTitle,
-    Checkbox, Tabs, TabsContent, TabsList, TabsTrigger, Label
+    Checkbox, Tabs, TabsContent, TabsList, TabsTrigger, Label, Table, TableHeader,
+    TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption,
+    DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
+    DropdownMenuSeparator, DropdownMenuTrigger, Dialog, DialogContent,
+    DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 }
