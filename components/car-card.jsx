@@ -1,18 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Heart, Car as CarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import { toggleSavedCar } from "@/actions/car-listing";
+import useFetch from "@/hooks/use-fetch";
+import { useAuth } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 const CarCard = ({ car }) => {
     const [isSaved, setIsSaved] = useState(car.wishlisted);
     const router = useRouter();
+    const { isSignedIn } = useAuth();
 
-    const handleToggleSave = (e) => { };
+    // Use the useFetch hook
+    const {
+        loading: isToggling,
+        fn: toggleSavedCarFn,
+        data: toggleResult,
+        error: toggleError,
+    } = useFetch(toggleSavedCar);
+
+    // Handle successful toggle
+    useEffect(() => {
+        if (toggleResult?.success && toggleResult.saved !== isSaved) {
+            setIsSaved(toggleResult.saved);
+            toast.success(toggleResult.message);
+        }
+    }, [toggleResult, isSaved]);
+
+    // Handle errors
+    useEffect(() => {
+        if (toggleError) {
+            toast.error("Failed to update favorites");
+        }
+    }, [toggleError]);
+
+    // Handle save/unsave car
+    const handleToggleSave = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!isSignedIn) {
+            toast.error("Please sign in to save cars");
+            router.push("/sign-in");
+            return;
+        }
+
+        if (isToggling) return;
+
+        await toggleSavedCarFn(car.id);  // Call the toggleSavedCar function using our useFetch hook
+    };
 
     return (
         <Card className="overflow-hidden hover:shadow-lg transition group">
@@ -38,11 +80,14 @@ const CarCard = ({ car }) => {
                     variant="ghost"
                     size="icon"
                     className={`absolute top-2 right-2 bg-white/90 rounded-full p-1.5 
-                        ${isSaved ? "text-red-500 hover:text-red-600" : "text-gray-600 hover:text-gray-900"}`
-                    }
+                        ${isSaved ? "text-red-500 hover:text-red-600" : "text-gray-600 hover:text-gray-900"}`}
                     onClick={handleToggleSave}
+                    disabled={isToggling}
                 >
-                    <Heart className={isSaved ? "fill-current" : ""} size={20} />
+                    {
+                        isToggling ? (<Loader2 className="h-4 w-4 animate-spin" />)
+                            : (<Heart className={isSaved ? "fill-current" : ""} size={20} />)
+                    }
                 </Button>
             </div>
 
@@ -75,3 +120,4 @@ const CarCard = ({ car }) => {
 }
 
 export default CarCard;
+

@@ -1,9 +1,11 @@
-import React from 'react'
+import React from "react";
 
-function MainLayout() {
+const MainLayout = ({ children }) => {
     return (
-        <div>MainLayout</div>
+        <div className="container mx-auto my-20">
+            {children}
+        </div>
     )
-}
+};
 
 export default MainLayout;

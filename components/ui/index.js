@@ -9,7 +9,7 @@ import { Label } from "./label";
 import { Badge } from "./badge";
 import { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption, } from "./table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "./dropdown-menu";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "./dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTrigger, DialogHeader, DialogTitle, } from "./dialog";
 
 export {
     Input, Button, Textarea, Select, SelectContent, SelectItem, SelectTrigger,
@@ -18,5 +18,5 @@ export {
     TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption, Badge,
     DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
     DropdownMenuSeparator, DropdownMenuTrigger, Dialog, DialogContent,
-    DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+    DialogDescription, DialogFooter, DialogHeader, DialogTrigger, DialogTitle,
 }
