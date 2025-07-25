@@ -8,7 +8,10 @@ import Footer from "@/components/footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Car Portal",
+  icons: {
+    icon: "/image.png",
+  },
+  title: "GearGrid",
   description: "Find your Dream Car",
 };
 
