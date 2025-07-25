@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CarIcon, Eye, Loader2, MoreHorizontal, Plus, Search, Star, StarOff, Trash2 } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { CarIcon, Eye, Loader2, MoreHorizontal, Plus, Search, Star, StarOff, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
     Input, Button, Card, CardContent, Table, TableHeader,
     TableBody, TableHead, TableRow, TableCell, DropdownMenu,
@@ -17,8 +18,10 @@ import Image from "next/image";
 
 const CarsList = () => {
     const [search, setSearch] = useState("");
+    const [searchInput, setSearchInput] = useState("");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [carToDelete, setCarToDelete] = useState(null);
+    const [openDropdownId, setOpenDropdownId] = useState(null);
 
     const router = useRouter();
 
@@ -42,6 +45,33 @@ const CarsList = () => {
         data: updateResult,
         error: updateError,
     } = useFetch(updateCarStatus);
+
+    // Debounced search function
+    const debouncedSearch = useCallback(
+        (() => {
+            let timeoutId;
+            return (searchTerm) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    setSearch(searchTerm);
+                }, 300);
+            };
+        })(),
+        []
+    );
+
+    // Handle search input changes
+    const handleSearchInputChange = (e) => {
+        const value = e.target.value;
+        setSearchInput(value);
+        debouncedSearch(value);
+    };
+
+    // Clear search
+    const clearSearch = () => {
+        setSearchInput("");
+        setSearch("");
+    };
 
     // Initial fetch and refetch on search changes
     useEffect(() => {
@@ -79,7 +109,8 @@ const CarsList = () => {
     // Handle search submit
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        fetchCars(search);
+        setSearch(searchInput);
+        setIsSearching(false);
     };
 
     // Handle delete car
@@ -100,7 +131,21 @@ const CarsList = () => {
     // Handle status change
     const handleStatusUpdate = async (car, newStatus) => {
         if (updatingCar) return;
+        setOpenDropdownId(null); // Close dropdown
         await updateCarStatusFn(car.id, { status: newStatus });
+    };
+
+    // Handle view car
+    const handleViewCar = (carId) => {
+        setOpenDropdownId(null); // Close dropdown
+        router.push(`/cars/${carId}`);
+    };
+
+    // Handle delete option click
+    const handleDeleteOptionClick = (car) => {
+        setOpenDropdownId(null); // Close dropdown
+        setCarToDelete(car);
+        setDeleteDialogOpen(true);
     };
 
     return (
@@ -116,9 +161,14 @@ const CarsList = () => {
                         <Input
                             type="search"
                             placeholder="Search cars..."
-                            className="pl-9 w-full sm:w-60"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            className="pl-9 pr-9 w-full sm:w-80"
+                            value={searchInput}
+                            onChange={handleSearchInputChange}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Escape') {
+                                    clearSearch();
+                                }
+                            }}
                         />
                     </div>
                 </form>
@@ -191,7 +241,10 @@ const CarsList = () => {
                                                         </Button>
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        <DropdownMenu>
+                                                        <DropdownMenu 
+                                                            open={openDropdownId === car.id}
+                                                            onOpenChange={(open) => setOpenDropdownId(open ? car.id : null)}
+                                                        >
                                                             <DropdownMenuTrigger asChild>
                                                                 <Button
                                                                     variant="ghost"
@@ -203,7 +256,7 @@ const CarsList = () => {
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
                                                                 <DropdownMenuLabel> Actions </DropdownMenuLabel>
-                                                                <DropdownMenuItem onClick={() => router.push(`/cars/${car.id}`)}>
+                                                                <DropdownMenuItem onClick={() => handleViewCar(car.id)}>
                                                                     <Eye className="mr-2 h-4 w-4" /> View </DropdownMenuItem>
                                                                 <DropdownMenuSeparator />
                                                                 <DropdownMenuLabel> Status </DropdownMenuLabel>
@@ -222,7 +275,7 @@ const CarsList = () => {
                                                                 <DropdownMenuSeparator />
                                                                 <DropdownMenuItem
                                                                     className="text-red-600"
-                                                                    onClick={() => { setCarToDelete(car); setDeleteDialogOpen(true); }}
+                                                                    onClick={() => handleDeleteOptionClick(car)}
                                                                 ><Trash2 className="mr-2 h-4 w-4" /> Delete </DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>

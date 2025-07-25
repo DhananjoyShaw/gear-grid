@@ -64,6 +64,7 @@ const AddCarForm = () => {
             setValue("price", carDetails.price);
             setValue("mileage", carDetails.mileage);
             setValue("transmission", carDetails.transmission);
+            setValue("seats", carDetails.seats ? carDetails.seats.toString() : "");
             setValue("description", carDetails.description);
 
             // Add the image to the uploaded images
@@ -171,7 +172,7 @@ const AddCarForm = () => {
                                     {/* Model */}
                                     <div className="space-y-2">
                                         <Label htmlFor="model">Model</Label>
-                                        <Input id="model" {...register("model")} placeholder="e.g. Camry" className={errors.model ? "border-red-500" : ""} />
+                                        <Input id="model" {...register("model")} placeholder="e.g. M5" className={errors.model ? "border-red-500" : ""} />
                                         {
                                             errors.model && (
                                                 <p className="text-xs text-red-500">
@@ -307,11 +308,15 @@ const AddCarForm = () => {
 
                                     {/* Seats */}
                                     <div className="space-y-2">
-                                        <Label htmlFor="seats">
-                                            Number of Seats{" "}
-                                            <span className="text-sm text-gray-500">(Optional)</span>
-                                        </Label>
-                                        <Input id="seats"   {...register("seats")} placeholder="e.g. 5" />
+                                        <Label htmlFor="seats">Number of Seats</Label>
+                                        <Input id="seats"   {...register("seats")} placeholder="e.g. 2-8 seats" className={errors.seats ? "border-red-500" : ""} />
+                                        {
+                                            errors.seats && (
+                                                <p className="text-xs text-red-500">
+                                                    {errors.seats.message}
+                                                </p>
+                                            )
+                                        }
                                     </div>
 
                                     {/* Status */}

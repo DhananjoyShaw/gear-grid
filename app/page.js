@@ -70,6 +70,7 @@ const Home = async () => {
                       src={make.image}
                       alt={make.name}
                       fill
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 16vw, 120px"
                       style={{ objectFit: "contain" }}
                     />
                   </div>
@@ -139,6 +140,7 @@ const Home = async () => {
                       src={type.image}
                       alt={type.name}
                       fill
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 200px"
                       className="object-cover group-hover:scale-105 transition duration-300"
                     />
                   </div>

@@ -19,6 +19,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
     const { isSignedIn } = useAuth();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isWishlisted, setIsWishlisted] = useState(car.wishlisted);
+    const [bookingLoading, setBookingLoading] = useState(false);
 
     const {
         loading: savingCar,
@@ -61,7 +62,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
             navigator
                 .share({
                     title: `${car.year} ${car.make} ${car.model}`,
-                    text: `Check out this ${car.year} ${car.make} ${car.model} on Vehiql!`,
+                    text: `Check out this ${car.year} ${car.make} ${car.model} on GearGrid!`,
                     url: window.location.href,
                 })
                 .catch((error) => {
@@ -85,6 +86,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
             router.push("/sign-in");
             return;
         }
+        setBookingLoading(true);
         router.push(`/test-drive/${car.id}`);
     };
 
@@ -100,6 +102,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
                                     src={car.images[currentImageIndex]}
                                     alt={`${car.year} ${car.make} ${car.model}`}
                                     fill className="object-cover" priority
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 800px"
                                 />
                             ) : (
                                 <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -126,6 +129,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
                                             <Image
                                                 src={image} fill className="object-cover"
                                                 alt={`${car.year} ${car.make} ${car.model} - view ${index + 1}`}
+                                                sizes="120px"
                                             />
                                         </div>
                                     ))
@@ -166,7 +170,9 @@ const CarDetails = ({ car, testDriveInfo }) => {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 my-6">
                         <div className="flex items-center gap-2">
                             <Gauge className="text-gray-500 h-5 w-5" />
-                            <span>{car.mileage.toLocaleString()} miles</span>
+                            <span>
+                                {car.mileage} {car.fuelType === "Electric" ? "km/kWh" : "km/L"}
+                            </span>
                         </div>
                         <div className="flex items-center gap-2">
                             <Fuel className="text-gray-500 h-5 w-5" />
@@ -200,7 +206,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Vehiql Car Loan Calculator</DialogTitle>
+                                <DialogTitle>GearGrid Car Loan Calculator</DialogTitle>
                                 <EmiCalculator price={car.price} />
                             </DialogHeader>
                         </DialogContent>
@@ -217,7 +223,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
                                 Our representatives are available to answer all your queries
                                 about this vehicle.
                             </p>
-                            <a href="mailto:help@vehiql.in">
+                            <a href="mailto:help@geargrid.in">
                                 <Button variant="outline" className="w-full"> Request Info </Button>
                             </a>
                         </CardContent>
@@ -239,15 +245,24 @@ const CarDetails = ({ car, testDriveInfo }) => {
                             <Button
                                 className="w-full py-6 text-lg"
                                 onClick={handleBookTestDrive}
-                                disabled={testDriveInfo.userTestDrive}
+                                disabled={testDriveInfo.userTestDrive || bookingLoading}
                             >
-                                <Calendar className="mr-2 h-5 w-5" />
-                                {testDriveInfo.userTestDrive
-                                    ? `Booked for ${format(
-                                        new Date(testDriveInfo.userTestDrive.bookingDate),
-                                        "EEEE, MMMM d, yyyy"
-                                    )}`
-                                    : "Book Test Drive"}
+                                {bookingLoading ? (
+                                    <span className="flex items-center justify-center gap-2">
+                                        <svg className="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                                        Booking...
+                                    </span>
+                                ) : (
+                                    <>
+                                        <Calendar className="mr-2 h-5 w-5" />
+                                        {testDriveInfo.userTestDrive
+                                            ? `Booked for ${format(
+                                                new Date(testDriveInfo.userTestDrive.bookingDate),
+                                                "EEEE, MMMM d, yyyy"
+                                            )}`
+                                            : "Book Test Drive"}
+                                    </>
+                                )}
                             </Button>
                         )
                     }
@@ -325,7 +340,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
                         <div className="flex justify-between py-2 border-b">
                             <span className="text-gray-600">Mileage</span>
                             <span className="font-medium">
-                                {car.mileage.toLocaleString()} miles
+                                {car.mileage} {car.fuelType === "Electric" ? "km/kWh" : "km/L"}
                             </span>
                         </div>
                         <div className="flex justify-between py-2 border-b">
@@ -353,7 +368,7 @@ const CarDetails = ({ car, testDriveInfo }) => {
                         <div className="flex items-start gap-3">
                             <LocateFixed className="h-5 w-5 text-blue-600 mt-1 flex-shrink-0" />
                             <div>
-                                <h4 className="font-medium">Vehiql Motors</h4>
+                                <h4 className="font-medium">GearGrid Motors</h4>
                                 <p className="text-gray-600">
                                     {testDriveInfo.dealership?.address || "Not Available"}
                                 </p>

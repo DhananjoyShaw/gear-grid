@@ -47,11 +47,23 @@ export async function processCarImageWithAI(file) {
       3. Year (approximately)
       4. Color
       5. Body type (SUV, Sedan, Hatchback, etc.)
-      6. Mileage
-      7. Fuel type (your best guess)
+      6. Mileage (fuel efficiency) - Provide the fuel efficiency with appropriate unit:
+         - For Petrol/Diesel cars: Use km/L format only (e.g., "15 km/L", "12 km/L")
+         - For Electric cars: Use km/kWh format only (e.g., "6 km/kWh", "8 km/kWh")
+         - For Hybrid cars: Use km/L format (most common mode, e.g., "18 km/L", "22 km/L")
+         
+         If you can't determine from the image, estimate based on the car's make, model, year, and fuel type. If still unable to determine, use these defaults:
+         - Petrol/Diesel: "12 km/L"
+         - Electric: "6 km/kWh"
+         - Hybrid: "18 km/L"
+         - SUV (any fuel): "10 km/L" or "4 km/kWh" (electric)
+         
+         Always include the appropriate unit. Do not leave this field empty.
+      7. Fuel type (your best guess) - Common types: Petrol, Diesel, Electric, Hybrid. If unclear, make your best educated guess based on the car's make, model, and year. Do not leave this field empty.
       8. Transmission type (your best guess)
-      9. Price (your best guess)
-      9. Short Description as to be added to a car listing
+      9. Price (your best guess) - Provide the estimated cost of the car in US dollars as a clean string with only numbers, no commas, no currency symbol. If the price is in rupees or any other currency, convert it to US dollars before returning, but do not include any symbol or commas (e.g., "25000" not "$25,000" or "₹2500000").
+      10. Number of seats - Estimate based on the car's body type and size (2 for sports cars, 4 for sedans, 6-7 for SUVs). Do not leave this field empty.
+      11. Short Description as to be added to a car listing
 
       Format your response as a clean JSON object with these fields:
       {
@@ -64,11 +76,14 @@ export async function processCarImageWithAI(file) {
         "bodyType": "",
         "fuelType": "",
         "transmission": "",
+        "seats": 0,
         "description": "",
         "confidence": 0.0
       }
 
       For confidence, provide a value between 0 and 1 representing how confident you are in your overall identification.
+      For price, provide only the numeric value as a string without any formatting symbols. The price can be any reasonable number (e.g., "15000", "250000", "12345678").
+      For mileage, provide the value with appropriate unit: "15 km/L" for petrol/diesel, "6 km/kWh" for electric, "18 km/L" for hybrid. Use default values if unable to determine.
       Only respond with the JSON object, nothing else.
     `;
 
@@ -93,6 +108,7 @@ export async function processCarImageWithAI(file) {
                 "mileage",
                 "fuelType",
                 "transmission",
+                "seats",
                 "description",
                 "confidence",
             ];
@@ -278,6 +294,12 @@ export async function deleteCar(id) {
             };
         }
 
+        // Delete related test drive bookings first (since they don't have cascade delete)
+        await db.testDriveBooking.deleteMany({
+            where: { carId: id },
+        });
+
+        // Delete the car (this will also cascade delete UserSavedCar entries)
         await db.car.delete({
             where: { id },
         });
@@ -291,7 +313,7 @@ export async function deleteCar(id) {
             const filePaths = car.images
                 .map((imageUrl) => {
                     const url = new URL(imageUrl);
-                    const pathMatch = url.pathname.match(/\/car-images\/(.*)/);
+                    const pathMatch = url.pathname.match(/\/gear-grid-images\/(.*)/);
                     return pathMatch ? pathMatch[1] : null;
                 })
                 .filter(Boolean);
@@ -299,7 +321,7 @@ export async function deleteCar(id) {
             // Delete files from storage if paths were extracted
             if (filePaths.length > 0) {
                 const { error } = await supabase.storage
-                    .from("car-images")
+                    .from("gear-grid-images")
                     .remove(filePaths);
 
                 if (error) {

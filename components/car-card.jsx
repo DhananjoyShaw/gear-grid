@@ -66,6 +66,7 @@ const CarCard = ({ car }) => {
                                 src={car.images[0]}
                                 alt={`${car.make} ${car.model}`}
                                 fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                                 className="object-cover group-hover:scale-105 transition duration-300"
                             />
                         </div>

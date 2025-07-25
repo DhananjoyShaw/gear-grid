@@ -51,10 +51,10 @@ CREATE TABLE "Car" (
 -- CreateTable
 CREATE TABLE "DealershipInfo" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL DEFAULT 'Vehiql Motors',
+    "name" TEXT NOT NULL DEFAULT 'GearGrid Motors',
     "address" TEXT NOT NULL DEFAULT '69 Car Street, Autoville, CA 69420',
     "phone" TEXT NOT NULL DEFAULT '+1 (555) 123-4567',
-    "email" TEXT NOT NULL DEFAULT 'contact@vehiql.com',
+    "email" TEXT NOT NULL DEFAULT 'contact@geargrid.com',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
